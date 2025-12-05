@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [react()],
   // IMPORTANT: Replace <YOUR_REPOSITORY_NAME> with your actual GitHub repo name
   // Example: If your repo is 'greendoc', this should be '/greendoc/'
-  base: '/<YOUR_REPOSITORY_NAME>/', 
+  base: '/green-doc/', 
   build: {
     outDir: 'dist',
     sourcemap: false

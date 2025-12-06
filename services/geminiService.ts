@@ -8,14 +8,19 @@ const getEnv = (key: string, viteKey: string) => {
     return null;
 };
 
-// HARDCODED KEY FOR RELIABILITY (Fallback)
-const FALLBACK_KEY = 'AIzaSyAmCCxfPWBNuRrXRlgezFcO-k8KGzc8E98';
+// STRICTLY ENV VARIABLES - NO HARDCODED FALLBACK
+const apiKey = getEnv('API_KEY', 'VITE_API_KEY') || getEnv('REACT_APP_API_KEY', 'VITE_API_KEY');
 
-const apiKey = getEnv('API_KEY', 'VITE_API_KEY') || getEnv('REACT_APP_API_KEY', 'VITE_API_KEY') || FALLBACK_KEY;
+if (!apiKey) {
+    console.warn("Gemini API Key is missing. Please check your .env file configuration.");
+}
 
-const ai = new GoogleGenAI({ apiKey });
+// Initialize with safe fallback for type safety, but requests will fail if key is missing
+const ai = new GoogleGenAI({ apiKey: apiKey || 'MISSING_KEY' });
 
 const generateEmbeddingWithRetry = async (text: string, retries = 3): Promise<number[] | null> => {
+  if (!apiKey) throw new Error("Missing Gemini API Key in environment variables.");
+
   const model = "text-embedding-004";
   for (let attempt = 0; attempt < retries; attempt++) {
     try {

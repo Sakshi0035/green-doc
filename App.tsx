@@ -11,19 +11,19 @@ import { GenerateContentResponse } from "@google/genai";
 import { ArrowLeft, MessageSquare, FileText } from 'lucide-react';
 
 // ENVIRONMENT CONFIGURATION
-// Supports: Standard process.env, Vite import.meta.env, and hardcoded fallback
+// Supports: Standard process.env, Vite import.meta.env
 const getEnv = (key: string, viteKey: string) => {
     // @ts-ignore
     if (typeof process !== 'undefined' && process.env && process.env[key]) return process.env[key];
     // @ts-ignore
     if (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env[viteKey]) return import.meta.env[viteKey];
-    return null;
+    return '';
 };
 
-// RELIABLE CONFIGURATION (Env vars -> Hardcoded Fallback)
+// RELIABLE CONFIGURATION (Strictly Env Vars)
 const APP_CONFIG: QdrantConfig = {
-    url: getEnv('QDRANT_URL', 'VITE_QDRANT_URL') || getEnv('REACT_APP_QDRANT_URL', 'VITE_QDRANT_URL') || 'https://c51732eb-f3c0-4d0f-96eb-716ae92974f6.us-east4-0.gcp.cloud.qdrant.io:6333',
-    apiKey: getEnv('QDRANT_API_KEY', 'VITE_QDRANT_API_KEY') || getEnv('REACT_APP_QDRANT_API_KEY', 'VITE_QDRANT_API_KEY') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhY2Nlc3MiOiJtIn0.SpspMgj7sf43nsBbaxaMfYectKaJ4arRMeVW-N69QRo',
+    url: getEnv('QDRANT_URL', 'VITE_QDRANT_URL') || getEnv('REACT_APP_QDRANT_URL', 'VITE_QDRANT_URL'),
+    apiKey: getEnv('QDRANT_API_KEY', 'VITE_QDRANT_API_KEY') || getEnv('REACT_APP_QDRANT_API_KEY', 'VITE_QDRANT_API_KEY'),
     collectionName: 'greendoc_collection'
 };
 
@@ -37,6 +37,16 @@ const App: React.FC = () => {
   const [mobileView, setMobileView] = useState<'chat' | 'doc'>('doc');
 
   useEffect(() => {
+    if (!APP_CONFIG.url || !APP_CONFIG.apiKey) {
+        console.warn("Missing API Configuration. Please check your .env file.");
+        setMessages(prev => [...prev, {
+            id: uuidv4(),
+            role: 'model',
+            content: "System Error: Missing API Keys. Please configure your .env file.",
+            timestamp: Date.now()
+        }]);
+        return;
+    }
     initQdrant(APP_CONFIG).catch(console.error);
   }, []);
 

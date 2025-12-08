@@ -1,0 +1,5 @@
+{
+  "name": "DocuChat AI - Qdrant RAG",
+  "description": "A RAG-based PDF chat application using Gemini 2.5 and Qdrant Vector Database.",
+  "requestFramePermissions": []
+}
